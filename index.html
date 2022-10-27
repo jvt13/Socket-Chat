@@ -22,10 +22,27 @@
     <script>
 
         var socket = io();
+        var nome = prompt('Qual o seu nome?');
+
+        alert('Bem vindo ao chat '+nome);
+
+        var messages = document.getElementById('messages');
+        var form = document.getElementById('form');
+        var input = document.getElementById('input');
+
+        form.addEventListener('submit', (e)=>{
+            e.preventDefault();
+
+            if(input.value){
+                socket.emit('chat message',{msg:input.value,nome:nome});
+                input.value='';
+                alert('Mensagem foi enviada com sucesso!');
+            }
+        })
+
         socket.on('conectado', function(msg) {
             console.log(msg);
         });
-
         socket.on('novo usuario', function(msg) {
             console.log(msg);
         });

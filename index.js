@@ -10,7 +10,10 @@ io.on('connection', (socket) => {
 
     console.log('Usuário conectado!');
     //io.emit('conectado','Estou conectado!');
-    socket.broadcast.emit('novo usuario','Um novo usuário se conectou!');
+    
+    socket.on('chat message',(obj)=>{
+        console.log(obj);
+    })
 
     socket.on('disconnect',()=>{
         console.log('Desconectado.');
