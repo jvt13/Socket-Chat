@@ -10,7 +10,9 @@
       #form > button { background: #333; border: none; padding: 0 1rem; margin: 0.25rem; border-radius: 3px; outline: none; color: #fff; }
       #messages { list-style-type: none; margin: 0; padding: 0; }
       #messages > li { padding: 0.5rem 1rem; }
-      #messages > li:nth-child(odd) { background: #efefef; }
+      #messages > li{
+        background-color: white;
+      }
     </style>
   </head>
   <body>
@@ -24,7 +26,16 @@
         var socket = io();
         var nome = prompt('Qual o seu nome?');
 
-        alert('Bem vindo ao chat '+nome);
+        socket.emit('new user', nome);
+
+        socket.on('new user', function(data){
+          if(data.success){
+            alert('Bem vindo ao chat '+nome);
+          }else{
+            alert('Já existe um usuário com esse nome...');
+            window.location.href= "/";
+          }
+        });
 
         var messages = document.getElementById('messages');
         var form = document.getElementById('form');
@@ -32,14 +43,31 @@
 
         form.addEventListener('submit', (e)=>{
             e.preventDefault();
-
             if(input.value){
                 socket.emit('chat message',{msg:input.value,nome:nome});
                 input.value='';
-                alert('Mensagem foi enviada com sucesso!');
+                //alert('Mensagem foi enviada com sucesso!');
             }
         })
 
+        socket.on('chat message', function(obj){
+
+          if(obj.nome == nome){
+            //Mesmo usuário mudar a cor
+            var item = document.createElement('li');
+            item.style.background = 'gray';
+            item.textContent = 'Você: ' +obj.msg;
+            messages.appendChild(item);
+            window.scrollTo(0,document.body.scrollHeight);
+          }else{
+            //Usuário diferente
+            var item = document.createElement('li');
+            item.style.background = 'green';
+            item.textContent = obj.nome +': ' +obj.msg;
+            messages.appendChild(item);
+            window.scrollTo(0,document.body.scrollHeight);
+          }
+        })
         socket.on('conectado', function(msg) {
             console.log(msg);
         });
